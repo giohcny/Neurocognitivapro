@@ -1,0 +1,65 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Compilar y probar
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # Los runners ubuntu-latest ya incluyen el Android SDK (ANDROID_HOME).
+      # Solo se aceptan licencias y se asegura la plataforma 34.
+      - name: Preparar Android SDK
+        run: |
+          SDKM="$(command -v sdkmanager || echo "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager")"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "platforms;android-34" "build-tools;34.0.0" || true
+
+      # Usa Gradle 8.9 directamente: el repositorio no incluye gradle-wrapper.jar
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Pruebas unitarias
+        run: gradle testDebugUnitTest --stacktrace
+
+      - name: Compilar APK de depuración
+        run: gradle assembleDebug --stacktrace
+
+      - name: Subir informe de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-pruebas
+          path: app/build/reports/tests/
+          if-no-files-found: ignore
+
+      - name: Subir APK de depuración
+        uses: actions/upload-artifact@v4
+        with:
+          name: neurocognitiva-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
