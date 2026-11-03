@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      # Kotlin, KSP y el compilador de Compose deben actualizarse juntos
+      kotlin-ksp:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+      androidx-compose:
+        patterns:
+          - "androidx.compose*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
