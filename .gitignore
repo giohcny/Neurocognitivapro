@@ -1,0 +1,24 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# Claves y firmas
+*.jks
+*.keystore
+keystore.properties
+
+# Nunca versionar datos de pacientes ni exportaciones
+*.db
+*.db-shm
+*.db-wal
+informe_*.pdf
+sesiones_paciente_*.csv
+exports/
