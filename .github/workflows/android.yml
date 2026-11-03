@@ -30,7 +30,7 @@ jobs:
           java-version: 17
 
       - name: Configurar Android SDK (acepta licencias)
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       # Usa Gradle 8.9 directamente: el repositorio no incluye gradle-wrapper.jar
       - name: Configurar Gradle
